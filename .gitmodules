@@ -1,0 +1,24 @@
+[submodule "tidal/extern/Crow"]
+	path = tidal/extern/Crow
+	url = https://github.com/CrowCpp/Crow.git
+	branch = v1.2.1
+[submodule "tidal/extern/sol2"]
+	path = tidal/extern/sol2
+	url = https://github.com/ThePhD/sol2.git
+	branch = develop
+[submodule "tidal/extern/EzPC"]
+	path = tidal/extern/EzPC
+	url = https://github.com/mpc-msri/EzPC.git
+	branch = master
+[submodule "tidal/extern/argh"]
+	path = tidal/extern/argh
+	url = https://github.com/adishavit/argh.git
+	branch = master
+[submodule "tidal/extern/spdlog"]
+	path = tidal/extern/spdlog
+	url = https://github.com/gabime/spdlog.git
+	branch = v1.x
+[submodule "tidal/extern/rapidcsv"]
+	path = tidal/extern/rapidcsv
+	url = https://github.com/d99kris/rapidcsv.git
+	branch = master
