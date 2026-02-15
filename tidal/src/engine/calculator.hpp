@@ -44,6 +44,9 @@ namespace tidal::engine {
         FPArray calculate(string_view funcName, const FPArray& operand);
         FPArray calculate(string_view funcName, const FPArray& operandLeft, const FPArray& operandRight);
     
+        void initProgress(size_t total);
+        void tick();
+
     private:
         void registerOperations();
 
@@ -55,6 +58,9 @@ namespace tidal::engine {
         unique_ptr<OTPack> otPack;
         unique_ptr<FPOp> fpOp;
         unique_ptr<FPMath> fpMath;
+
+        size_t totalSteps{0};
+        size_t currentStep{0};
     };
 }
     

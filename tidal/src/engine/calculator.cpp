@@ -1,6 +1,8 @@
 #include <format>
 #include <stdexcept>
+#include "spdlog/spdlog.h"
 #include "calculator.hpp"
+#include "types.hpp"
 
 namespace tidal::engine {
     using std::make_unique;
@@ -27,7 +29,7 @@ namespace tidal::engine {
     }
 
     FPArray Calculator::input(vector<Number>& plain, bool dummy) {
-        int inputParty = dummy ? (OPPOSITE - this->calRole) : this->calRole;
+        int inputParty = dummy ? (this->calRole | OPPOSITE) : this->calRole;
         return this->fpOp->input(inputParty, plain.size(), plain.data());
     }
 
@@ -36,15 +38,25 @@ namespace tidal::engine {
     }
 
     FPArray Calculator::calculate(string_view funcName, const FPArray& operand) {
-        if (auto it = this->unaryFuncMap.find(funcName); it != unaryFuncMap.end())
-            return it->second(operand);
-        throw std::runtime_error(format("Unknown unary function: {}", funcName));
+        if (auto it = this->unaryFuncMap.find(funcName); it != unaryFuncMap.end()) {
+            auto res = it->second(operand);
+            this->tick();
+            return res;
+        }
+            
+        spdlog::error("[calculator] unknown unary function: {}", funcName);
+        throw std::runtime_error(format("unknown unary function: {}", funcName));
     }
 
     FPArray Calculator::calculate(string_view funcName, const FPArray& operandLeft, const FPArray& operandRight) {
-        if (auto it = this->binaryFuncMap.find(funcName); it != binaryFuncMap.end())
-            return it->second(operandLeft, operandRight);
-        throw std::runtime_error(format("Unknown binary function: {}", funcName));
+        if (auto it = this->binaryFuncMap.find(funcName); it != binaryFuncMap.end()) {
+            auto res = it->second(operandLeft, operandRight);
+            this->tick();
+            return res;
+        }
+
+        spdlog::error("[calculator] unknown binary function: {}", funcName);
+        throw std::runtime_error(format("unknown binary function: {}", funcName));
     }
 
     void Calculator::registerOperations() {
@@ -67,5 +79,15 @@ namespace tidal::engine {
             {"max", [this](const FPArray& x, const FPArray& y) { return this->fpOp->max(x, y); }},
             {"min", [this](const FPArray& x, const FPArray& y) { return this->fpOp->min(x, y); }},
         };
+    }
+
+    void Calculator::initProgress(size_t total) {
+        this->totalSteps = total;
+        this->currentStep = 0;
+    }
+
+    void Calculator::tick() {
+        this->currentStep++;
+        spdlog::info("[calculator] progress: {}/{}", this->currentStep, this->totalSteps);
     }
 }

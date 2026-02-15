@@ -32,6 +32,8 @@ namespace tidal::engine {
                 return docPure.GetColumn<Number>(linesNumber > 0 ? linesNumber - 1 : 0);
             }
 
+            spdlog::info("[data_process] loaded data from file {}", path);
+            
         } catch (const std::exception& e) {
             spdlog::error("[data_process] failed to load CSV file {}: {}", path, e.what());
             return {};
@@ -39,32 +41,37 @@ namespace tidal::engine {
     }
 
     void saveDataToCSV(const string &path, const vector<Number> &data, CSVFormat format) {
-        std::filesystem::path p(path);
-        if (p.has_parent_path())
-            std::filesystem::create_directories(p.parent_path());
+        try {
+            std::filesystem::path p(path);
+            if (p.has_parent_path())
+                std::filesystem::create_directories(p.parent_path());
 
-        int columnNameIdx = (format == CSVFormat::WithHeader) ? 0 : -1;
-        rapidcsv::Document doc(
-            "", 
-            rapidcsv::LabelParams(columnNameIdx, -1), 
-            rapidcsv::SeparatorParams(',')
-        );
-        
-        if (format == CSVFormat::WithHeader) {
-            doc.SetColumnName(0, "number");
-            doc.SetColumnName(1, "value");
+            int columnNameIdx = (format == CSVFormat::WithHeader) ? 0 : -1;
+            rapidcsv::Document doc(
+                "", 
+                rapidcsv::LabelParams(columnNameIdx, -1), 
+                rapidcsv::SeparatorParams(',')
+            );
+            
+            if (format == CSVFormat::WithHeader) {
+                doc.SetColumnName(0, "number");
+                doc.SetColumnName(1, "value");
 
-            for (auto i = static_cast<int>(data.size() - 1); i >= 0; i--) {
-                doc.SetCell<size_t>(0, i, i + 1);
-                doc.SetCell<Number>(1, i, data[i]);
+                for (auto i = static_cast<int>(data.size() - 1); i >= 0; i--) {
+                    doc.SetCell<size_t>(0, i, i + 1);
+                    doc.SetCell<Number>(1, i, data[i]);
+                }
+            } else {
+                for (auto i = static_cast<int>(data.size() - 1); i >= 0; i--) {
+                    doc.SetCell<Number>(0, i, data[i]);
+                }
             }
-        } else {
-            for (auto i = static_cast<int>(data.size() - 1); i >= 0; i--) {
-                doc.SetCell<Number>(0, i, data[i]);
-            }
+
+            doc.Save(path);
+            spdlog::info("[data_process] saved {} entries to {}", data.size(), path);
+
+        } catch (const std::exception& e) {
+            spdlog::error("[data_process] failed to save CSV file {}: {}", path, e.what());
         }
-
-        doc.Save(path);
-        spdlog::info("[data_process] saved {} entries to {}", data.size(), path);
     }
 }

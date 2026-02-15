@@ -8,8 +8,8 @@ options = {
 
 OptionParser.new do |opts|
   opts.banner = "usage: ruby gen_data.rb [options]"
-  opts.on("-f NAME", "--file NAME", "Output filename") { |f| options[:filename] = f }
-  opts.on("-n COUNT", "--number COUNT", Integer, "Number of data entries") { |n| options[:count] = n }
+  opts.on("-f NAME", "--file NAME", "output filename") { |f| options[:filename] = f }
+  opts.on("-n COUNT", "--number COUNT", Integer, "number of data entries") { |n| options[:count] = n }
 end.parse!
 
 dir = File.dirname(options[:filename])

@@ -1,5 +1,7 @@
 #include <cctype>
+#include <format>
 #include <utility>
+#include "spdlog/spdlog.h"
 #include "types.hpp"
 #include "equation_parser.hpp"
 
@@ -8,11 +10,12 @@ namespace tidal::engine {
     using std::make_unique;
     using std::isalpha;
     using std::isspace;
+    using std::format;
 
     EquationParser::EquationParser() : pos(0), equation("") {}
 
     char EquationParser::peek() {
-        while (pos < equation.size() && std::isspace(equation[pos])) pos++;
+        while (pos < equation.size() && isspace(equation[pos])) pos++;
         if (pos == equation.size()) return 0;
         return equation[pos];
     }
@@ -82,7 +85,10 @@ namespace tidal::engine {
         if (c == L_PAR) {
             this->get();
             auto node = this->parseExpression();
-            if (this->get() != R_PAR) throw std::runtime_error("expected ')'");
+            if (this->get() != R_PAR) {
+                spdlog::error("[equation_parser] expected ')'");
+                throw std::runtime_error("expected ')'");
+            }
             
             return node;
         }
@@ -97,28 +103,36 @@ namespace tidal::engine {
 
                 if (BinaryFuncNames.count(name)) {
                     auto arg1 = this->parseExpression();
-                    if (this->get() != COMMA) 
-                        throw std::runtime_error("Expected ',' in binary function " + name);
+                    if (this->get() != COMMA) {
+                        spdlog::error("[equation_parser] expected ',' in binary function {}", name);
+                        throw std::runtime_error(format("expected ',' in binary function {}", name));
+                    }
 
                     auto arg2 = this->parseExpression();
-                    if (this->get() != R_PAR) 
-                        throw std::runtime_error("Expected ')' after function args");
+                    if (this->get() != R_PAR) {
+                        spdlog::error("[equation_parser] expected ')' after function args");
+                        throw std::runtime_error("expected ')' after function args");
+                    }
 
                     return make_unique<BinaryOperationNode>(std::move(arg1), std::move(arg2), name);
                 } else if (UnaryFuncNames.count(name)) {
                     auto arg = this->parseExpression();
-                    if (this->get() != R_PAR) 
-                        throw std::runtime_error("Expected ')' after function arg");
+                    if (this->get() != R_PAR) {
+                        spdlog::error("[equation_parser] expected ')' after function arg");
+                        throw std::runtime_error("expected ')' after function arg");
+                    }
 
                     return make_unique<UnaryOperationNode>(std::move(arg), name);
                 } else {
-                    throw std::runtime_error("Unknown function: " + name);
+                    spdlog::error("[equation_parser] unknown function: {}", name);
+                    throw std::runtime_error(format("unknown function: {}", name));
                 }
             }
 
             return make_unique<VariableNode>(name);
         }
 
-        throw std::runtime_error(std::string("Unexpected character: ") + c);
+        spdlog::error("[equation_parser] unexpected character: {}", c);
+        throw std::runtime_error(format("unexpected character: {}", c));
     }
 }

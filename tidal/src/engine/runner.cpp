@@ -27,6 +27,7 @@ namespace tidal::engine {
         Context context = {{"A", aliceData}, {"B", bobData}};
 
         auto parsedRoot = this->parser->parse(expression);
+        this->calculator->initProgress(parsedRoot->size());
         auto calculatedResult = parsedRoot->eval(context, *this->calculator);
         return this->calculator->output(calculatedResult);
     }

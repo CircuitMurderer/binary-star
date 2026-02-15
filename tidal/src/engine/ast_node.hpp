@@ -12,6 +12,9 @@ namespace tidal::engine {
     public:
         virtual ~ASTNode() = default;
         virtual FPArray eval(const Context& ctx, Calculator& calculator) = 0;
+        size_t size() const { return nodeCount; }
+    protected:
+        size_t nodeCount = 0;
     };
 
     class VariableNode : public ASTNode {

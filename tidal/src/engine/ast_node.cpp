@@ -1,20 +1,26 @@
 #include <format>
 #include <stdexcept>
+#include "spdlog/spdlog.h"
 #include "ast_node.hpp"
 
 namespace tidal::engine {
     using std::format;
 
-    VariableNode::VariableNode(string n): name(std::move(n)) {}
+    VariableNode::VariableNode(string n): name(std::move(n)) {
+        this->nodeCount = 0;
+    }
 
     FPArray VariableNode::eval(const Context& ctx, Calculator& calculator) {
         if (auto it = ctx.find(this->name); it != ctx.end()) 
             return it->second;
+        spdlog::error("[ast_node] variable not found in context: {}", this->name);
         throw std::runtime_error(format("variable not found in context: {}", this->name));
     }
 
     BinaryOperationNode::BinaryOperationNode(unique_ptr<ASTNode> l, unique_ptr<ASTNode> r, string fn)
-        : left(std::move(l)), right(std::move(r)), funcName(std::move(fn)) {}
+        : left(std::move(l)), right(std::move(r)), funcName(std::move(fn)) {
+        this->nodeCount = 1 + this->left->size() + this->right->size();
+    }
 
     FPArray BinaryOperationNode::eval(const Context& ctx, Calculator& calculator) {
         auto leftValue = this->left->eval(ctx, calculator);
@@ -23,7 +29,9 @@ namespace tidal::engine {
     }
 
     UnaryOperationNode::UnaryOperationNode(unique_ptr<ASTNode> c, string fn)
-        : child(std::move(c)), funcName(std::move(fn)) {}
+        : child(std::move(c)), funcName(std::move(fn)) {
+        this->nodeCount = 1 + this->child->size();
+    }
 
     FPArray UnaryOperationNode::eval(const Context& ctx, Calculator& calculator) {
         auto childValue = this->child->eval(ctx, calculator);
