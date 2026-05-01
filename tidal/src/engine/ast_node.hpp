@@ -12,9 +12,9 @@ namespace tidal::engine {
     public:
         virtual ~ASTNode() = default;
         virtual FPArray eval(const Context& ctx, Calculator& calculator) = 0;
-        size_t size() const { return nodeCount; }
+        size_t size() const { return node_count; }
     protected:
-        size_t nodeCount = 0;
+        size_t node_count = 0;
     };
 
     class VariableNode : public ASTNode {
@@ -32,7 +32,7 @@ namespace tidal::engine {
     private:
         unique_ptr<ASTNode> left;
         unique_ptr<ASTNode> right;
-        string funcName;
+        string func_name;
     };
 
     class UnaryOperationNode : public ASTNode {
@@ -41,6 +41,6 @@ namespace tidal::engine {
         FPArray eval(const Context& ctx, Calculator& calculator) override;
     private:
         unique_ptr<ASTNode> child;
-        string funcName;
+        string func_name;
     };
 }

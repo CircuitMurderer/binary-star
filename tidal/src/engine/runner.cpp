@@ -4,7 +4,7 @@
 #include <vector>
 #include "runner.hpp"
 #include "calculator.hpp"
-#include "data_process.hpp"
+#include "utils/data_process.hpp"
 #include "equation_parser.hpp"
 #include "types.hpp"
 
@@ -16,31 +16,31 @@ namespace tidal::engine {
     CalculateRunner::CalculateRunner(int role, int port, string address) 
         : role(role), port(port), address(std::move(address)), calculator(nullptr), parser(nullptr) {}
 
-    void CalculateRunner::lazyInit() {
+    void CalculateRunner::lazy_init() {
         if (!this->calculator) this->calculator = make_unique<Calculator>(this->role, this->port, this->address);
         if (!this->parser) this->parser = make_unique<EquationParser>();
     }
 
     vector<Number> CalculateRunner::process(vector<Number>& data, const string& expression) {
-        auto aliceData = this->calculator->input(data, this->role != ALICE);
-        auto bobData = this->calculator->input(data, this->role != BOB);
-        Context context = {{"A", aliceData}, {"B", bobData}};
+        auto alice_data = this->calculator->input(data, this->role != ALICE);
+        auto bob_data = this->calculator->input(data, this->role != BOB);
+        Context context = {{"A", alice_data}, {"B", bob_data}};
 
-        auto parsedRoot = this->parser->parse(expression);
-        this->calculator->initProgress(parsedRoot->size());
-        auto calculatedResult = parsedRoot->eval(context, *this->calculator);
-        return this->calculator->output(calculatedResult);
+        auto parsed_root = this->parser->parse(expression);
+        this->calculator->init_progress(parsed_root->size());
+        auto calculated_result = parsed_root->eval(context, *this->calculator);
+        return this->calculator->output(calculated_result);
     }
 
-    void CalculateRunner::run(const string& expression, const string& dataPath, const string& savePath) {
-        this->lazyInit();
-        auto data = loadDataFromCSV(dataPath);
+    void CalculateRunner::run(const string& expression, const string& data_path, const string& save_path) {
+        this->lazy_init();
+        auto data = loadDataFromCSV(data_path);
         auto result = this->process(data, expression);
-        if (this->role == ALICE) saveDataToCSV(savePath, result);
+        if (this->role == ALICE) saveDataToCSV(save_path, result);
     }
 
-    vector<Number> CalculateRunner::run(const string& expression, vector<Number>& dataSerial) {
-        this->lazyInit();
-        return this->process(dataSerial, expression);
+    vector<Number> CalculateRunner::run(const string& expression, vector<Number>& data_serial) {
+        this->lazy_init();
+        return this->process(data_serial, expression);
     }
 }

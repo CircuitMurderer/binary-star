@@ -28,6 +28,6 @@ namespace tidal::engine {
     constexpr char R_PAR = ')';
     constexpr char COMMA = ',';
 
-    const unordered_set<string> UnaryFuncNames = {"sinpi", "cospi", "tanpi", "exp2", "log2", "exp", "ln", "erf"};
-    const unordered_set<string> BinaryFuncNames = {"add", "sub", "mul", "div", "max", "min"};
+    const unordered_set<string> UNARY_FUNC_NAMES = {"sinpi", "cospi", "tanpi", "exp2", "log2", "exp", "ln", "erf"};
+    const unordered_set<string> BINARY_FUNC_NAMES = {"add", "sub", "mul", "div", "max", "min"};
 }

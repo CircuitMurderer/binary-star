@@ -30,22 +30,22 @@ namespace tidal::engine {
         this->equation = expression;
         this->pos = 0;
 
-        return this->parseExpression();
+        return this->parse_expression();
     }
 
-    unique_ptr<ASTNode> EquationParser::parseExpression() {
-        auto left = this->parseTerm();
+    unique_ptr<ASTNode> EquationParser::parse_expression() {
+        auto left = this->parse_term();
 
         while (true) {
             auto c = this->peek();
             if (c == ADD) {
                 this->get();
-                auto right = this->parseTerm();
+                auto right = this->parse_term();
                 left = make_unique<BinaryOperationNode>(std::move(left), std::move(right), "add");
 
             } else if (c == SUB) {
                 this->get();
-                auto right = this->parseTerm();
+                auto right = this->parse_term();
                 left = make_unique<BinaryOperationNode>(std::move(left), std::move(right), "sub");
 
             } else {
@@ -56,19 +56,19 @@ namespace tidal::engine {
         return left;
     }
 
-    unique_ptr<ASTNode> EquationParser::parseTerm() {
-        auto left = this->parseFactor();
+    unique_ptr<ASTNode> EquationParser::parse_term() {
+        auto left = this->parse_factor();
 
         while (true) {
             auto c = this->peek();
             if (c == MUL) {
                 this->get();
-                auto right = this->parseFactor();
+                auto right = this->parse_factor();
                 left = make_unique<BinaryOperationNode>(std::move(left), std::move(right), "mul");
 
             } else if (c == DIV) {
                 this->get();
-                auto right = this->parseFactor();
+                auto right = this->parse_factor();
                 left = make_unique<BinaryOperationNode>(std::move(left), std::move(right), "div");
 
             } else {
@@ -79,12 +79,12 @@ namespace tidal::engine {
         return left;
     } 
 
-    unique_ptr<ASTNode> EquationParser::parseFactor() {
+    unique_ptr<ASTNode> EquationParser::parse_factor() {
         auto c = this->peek();
 
         if (c == L_PAR) {
             this->get();
-            auto node = this->parseExpression();
+            auto node = this->parse_expression();
             if (this->get() != R_PAR) {
                 spdlog::error("[equation_parser] expected ')'");
                 throw std::runtime_error("expected ')'");
@@ -101,22 +101,22 @@ namespace tidal::engine {
             if (this->peek() == L_PAR) {
                 this->get();
 
-                if (BinaryFuncNames.count(name)) {
-                    auto arg1 = this->parseExpression();
+                if (BINARY_FUNC_NAMES.count(name)) {
+                    auto arg1 = this->parse_expression();
                     if (this->get() != COMMA) {
                         spdlog::error("[equation_parser] expected ',' in binary function {}", name);
                         throw std::runtime_error(format("expected ',' in binary function {}", name));
                     }
 
-                    auto arg2 = this->parseExpression();
+                    auto arg2 = this->parse_expression();
                     if (this->get() != R_PAR) {
                         spdlog::error("[equation_parser] expected ')' after function args");
                         throw std::runtime_error("expected ')' after function args");
                     }
 
                     return make_unique<BinaryOperationNode>(std::move(arg1), std::move(arg2), name);
-                } else if (UnaryFuncNames.count(name)) {
-                    auto arg = this->parseExpression();
+                } else if (UNARY_FUNC_NAMES.count(name)) {
+                    auto arg = this->parse_expression();
                     if (this->get() != R_PAR) {
                         spdlog::error("[equation_parser] expected ')' after function arg");
                         throw std::runtime_error("expected ')' after function arg");

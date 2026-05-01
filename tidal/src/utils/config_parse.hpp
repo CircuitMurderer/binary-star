@@ -4,7 +4,7 @@ namespace tidal::utils {
     using std::string;
 
     struct ArgsConfig {
-        string configPath;
+        string config_path;
     };
 
     struct LocalConfig {
@@ -13,10 +13,10 @@ namespace tidal::utils {
         string address;
 
         string expression;
-        string dataPath;
-        string savePath;
+        string data_path;
+        string save_path;
     };
 
-    ArgsConfig parseArgsConfig(int argc, char **argv);
-    LocalConfig parseLocalConfig(const string& path);
+    ArgsConfig parse_args_config(int argc, char **argv);
+    LocalConfig parse_local_config(const string& path);
 }

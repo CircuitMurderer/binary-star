@@ -48,6 +48,7 @@ add_executable(
 
 target_include_directories(${PROJECT_NAME} PRIVATE
     "${LUA_INCLUDE_DIR}"
+    "${CMAKE_SOURCE_DIR}/src"
 )
 
 target_link_libraries(

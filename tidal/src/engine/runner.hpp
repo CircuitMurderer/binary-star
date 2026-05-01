@@ -15,11 +15,11 @@ namespace tidal::engine {
         explicit CalculateRunner(int role, int port, string address);
         ~CalculateRunner() = default;
 
-        void run(const string& expression, const string& dataPath, const string& savePath); // offline
-        vector<Number> run(const string& expression, vector<Number>& dataSerial);           // online
+        void run(const string& expression, const string& data_path, const string& save_path); // offline
+        vector<Number> run(const string& expression, vector<Number>& data_serial);           // online
     
     private:
-        void lazyInit();
+        void lazy_init();
         vector<Number> process(vector<Number>& data, const string& expression);
 
         int role;

@@ -4,6 +4,7 @@
 #include <string>
 #include <string_view>
 #include <unordered_map>
+#include <utility>
 #include <utils/constants.h>
 #include <vector>
 #include "FloatingPoint/floating-point.h"
@@ -18,6 +19,7 @@ namespace tidal::engine {
     using std::unique_ptr;
     using std::equal_to;
     using std::function;
+    using std::pair;
 
     using sci::IOPack;
     using sci::OTPack;
@@ -41,26 +43,26 @@ namespace tidal::engine {
         FPArray input(vector<Number>& plain, bool dummy = false);
         vector<Number> output(FPArray& cypher);
 
-        FPArray calculate(string_view funcName, const FPArray& operand);
-        FPArray calculate(string_view funcName, const FPArray& operandLeft, const FPArray& operandRight);
+        FPArray calculate(string_view func_name, const FPArray& operand);
+        FPArray calculate(string_view func_name, const FPArray& operand_left, const FPArray& operand_right);
     
-        void initProgress(size_t total);
-        void tick();
+        void init_progress(size_t total);
+        pair<size_t, size_t> tick_tock(bool verbose = false);
 
     private:
-        void registerOperations();
+        void register_operations();
 
-        unordered_map<string, UnaryFunc, StringHash, equal_to<>> unaryFuncMap;
-        unordered_map<string, BinaryFunc, StringHash, equal_to<>> binaryFuncMap;
+        unordered_map<string, UnaryFunc, StringHash, equal_to<>> unary_funcs;
+        unordered_map<string, BinaryFunc, StringHash, equal_to<>> binary_funcs;
 
-        int calRole;
-        unique_ptr<IOPack> ioPack;
-        unique_ptr<OTPack> otPack;
-        unique_ptr<FPOp> fpOp;
-        unique_ptr<FPMath> fpMath;
+        int cal_role;
+        unique_ptr<IOPack> io_pack;
+        unique_ptr<OTPack> ot_pack;
+        unique_ptr<FPOp> fp_op;
+        unique_ptr<FPMath> fp_math;
 
-        size_t totalSteps{0};
-        size_t currentStep{0};
+        size_t total_steps{0};
+        size_t current_step{0};
     };
 }
     

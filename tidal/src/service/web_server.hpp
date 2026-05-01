@@ -1,6 +1,10 @@
-
+#pragma once
 #include <chrono>
+#include <crow/websocket.h>
 #include <memory>
+#include <mutex>
+#include <string>
+#include <unordered_set>
 #include "crow/app.h"
 #include "crow/http_response.h"
 #include "crow/http_request.h"
@@ -29,8 +33,18 @@ namespace tidal::service {
         explicit WebServer();
         ~WebServer() = default;
 
+        // ws
+        void ws_send(crow::websocket::connection *conn, const std::string& msg);
+        void ws_close(crow::websocket::connection *conn);
+
+        void run(int port);
+
     private:
         unique_ptr<crow::App<RequestLogger, CORSMiddleware>> app;
-        
+
+        std::mutex ws_mtx;
+        std::unordered_set<crow::websocket::connection*> ws_conns;
+
+        void setup_ws();
     };
 }

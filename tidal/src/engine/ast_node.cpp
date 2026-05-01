@@ -7,7 +7,7 @@ namespace tidal::engine {
     using std::format;
 
     VariableNode::VariableNode(string n): name(std::move(n)) {
-        this->nodeCount = 0;
+        this->node_count = 0;
     }
 
     FPArray VariableNode::eval(const Context& ctx, Calculator& calculator) {
@@ -18,23 +18,23 @@ namespace tidal::engine {
     }
 
     BinaryOperationNode::BinaryOperationNode(unique_ptr<ASTNode> l, unique_ptr<ASTNode> r, string fn)
-        : left(std::move(l)), right(std::move(r)), funcName(std::move(fn)) {
-        this->nodeCount = 1 + this->left->size() + this->right->size();
+        : left(std::move(l)), right(std::move(r)), func_name(std::move(fn)) {
+        this->node_count = 1 + this->left->size() + this->right->size();
     }
 
     FPArray BinaryOperationNode::eval(const Context& ctx, Calculator& calculator) {
-        auto leftValue = this->left->eval(ctx, calculator);
-        auto rightValue = this->right->eval(ctx, calculator);
-        return calculator.calculate(this->funcName, leftValue, rightValue);
+        auto left_value = this->left->eval(ctx, calculator);
+        auto right_value = this->right->eval(ctx, calculator);
+        return calculator.calculate(this->func_name, left_value, right_value);
     }
 
     UnaryOperationNode::UnaryOperationNode(unique_ptr<ASTNode> c, string fn)
-        : child(std::move(c)), funcName(std::move(fn)) {
-        this->nodeCount = 1 + this->child->size();
+        : child(std::move(c)), func_name(std::move(fn)) {
+        this->node_count = 1 + this->child->size();
     }
 
     FPArray UnaryOperationNode::eval(const Context& ctx, Calculator& calculator) {
-        auto childValue = this->child->eval(ctx, calculator);
-        return calculator.calculate(this->funcName, childValue);
+        auto child_value = this->child->eval(ctx, calculator);
+        return calculator.calculate(this->func_name, child_value);
     }
 }

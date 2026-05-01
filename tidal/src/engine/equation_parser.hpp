@@ -22,10 +22,10 @@ namespace tidal::engine {
 
         char peek();
         char get();
-        bool matchString(const string& s);
+        bool match_string(const string& s);
 
-        unique_ptr<ASTNode> parseExpression();  // +, -
-        unique_ptr<ASTNode> parseTerm();        // *, /
-        unique_ptr<ASTNode> parseFactor();      // (), func, var
+        unique_ptr<ASTNode> parse_expression();  // +, -
+        unique_ptr<ASTNode> parse_term();        // *, /
+        unique_ptr<ASTNode> parse_factor();      // (), func, var
     };
 }
